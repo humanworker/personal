@@ -1,6 +1,7 @@
-const { getStoreItem, setStoreItem } = require("@netlify/functions/dist/function/templates/util/kv_store");
+const { handler } = require('@netlify/functions');
+const { getKVStore } = require('@netlify/functions');
 
-exports.handler = async (event, context) => {
+const saveEntries = async (event, context) => {
   console.log("Save entries function called");
 
   if (event.httpMethod !== 'POST') {
@@ -12,11 +13,12 @@ exports.handler = async (event, context) => {
     const entries = JSON.parse(event.body);
     console.log("Entries to save:", entries);
     
-    await setStoreItem('entries', JSON.stringify(entries));
+    const store = getKVStore();
+    await store.set('entries', JSON.stringify(entries));
     console.log("Entries saved successfully");
 
     // Verify the save by immediately retrieving
-    const savedEntries = await getStoreItem('entries');
+    const savedEntries = await store.get('entries');
     console.log("Retrieved after save:", savedEntries);
 
     return {
@@ -31,3 +33,5 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+exports.handler = handler(saveEntries);

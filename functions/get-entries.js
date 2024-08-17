@@ -1,6 +1,7 @@
-const { getStoreItem } = require("@netlify/functions/dist/function/templates/util/kv_store");
+const { handler } = require('@netlify/functions');
+const { getKVStore } = require('@netlify/functions');
 
-exports.handler = async (event, context) => {
+const getEntries = async (event, context) => {
   console.log("Get entries function called");
 
   if (event.httpMethod !== 'GET') {
@@ -9,7 +10,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const entriesString = await getStoreItem('entries');
+    const store = getKVStore();
+    const entriesString = await store.get('entries');
     console.log("Retrieved entries string:", entriesString);
 
     const entries = entriesString ? JSON.parse(entriesString) : [];
@@ -27,3 +29,5 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+exports.handler = handler(getEntries);
