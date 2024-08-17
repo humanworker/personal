@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
             entries = data;
             renderEntries();
         })
-        .catch(() => {
-            console.log('No existing entries found');
+        .catch(error => {
+            console.error('Error loading entries:', error);
         });
 
     form.addEventListener('submit', (e) => {
@@ -41,13 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveEntries() {
-        const blob = new Blob([JSON.stringify(entries)], {type: 'application/json'});
-        const formData = new FormData();
-        formData.append('file', blob, 'entries.json');
-
         fetch('/.netlify/functions/save-entries', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(entries)
         }).then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
