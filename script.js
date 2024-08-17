@@ -6,14 +6,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let entries = [];
 
     // Load existing entries
-    fetch('entries.json')
-        .then(response => response.json())
+    fetch('/.netlify/functions/get-entries')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("Entries retrieved:", data);
             entries = data;
             renderEntries();
         })
         .catch(error => {
             console.error('Error loading entries:', error);
+            entriesContainer.innerHTML = `<p>Error loading entries: ${error.message}</p>`;
         });
 
     form.addEventListener('submit', (e) => {
@@ -32,12 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function renderEntries() {
-        entriesContainer.innerHTML = entries.map(entry => `
-            <div class="blog-entry">
-                <p>${entry.content}</p>
-                <p class="date">${new Date(entry.date).toLocaleString()}</p>
-            </div>
-        `).join('');
+        entriesContainer.innerHTML = entries.length 
+            ? entries.map(entry => `
+                <div class="blog-entry">
+                    <p>${entry.content}</p>
+                    <p class="date">${new Date(entry.date).toLocaleString()}</p>
+                </div>
+            `).join('')
+            : '<p>No entries yet.</p>';
     }
 
     function saveEntries() {
@@ -47,13 +56,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(entries)
-        }).then(response => {
+        })
+        .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            console.log('Entries saved successfully');
-        }).catch(error => {
+            return response.json();
+        })
+        .then(data => {
+            console.log('Entries saved successfully:', data);
+        })
+        .catch(error => {
             console.error('Error saving entries:', error);
+            alert(`Failed to save entry: ${error.message}`);
         });
     }
 });
