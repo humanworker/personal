@@ -1,0 +1,12 @@
+{
+    "name": "simple-blog",
+    "version": "1.0.0",
+    "description": "A simple blog using Netlify functions",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+      "@netlify/functions": "^2.0.0"
+    }
+  }
