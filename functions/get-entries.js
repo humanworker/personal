@@ -1,7 +1,6 @@
-const { handler } = require('@netlify/functions');
 const { getKVStore } = require('@netlify/functions');
 
-const getEntries = async (event, context) => {
+exports.handler = async (event, context) => {
   console.log("Get entries function called");
 
   if (event.httpMethod !== 'GET') {
@@ -29,5 +28,3 @@ const getEntries = async (event, context) => {
     };
   }
 };
-
-exports.handler = handler(getEntries);
